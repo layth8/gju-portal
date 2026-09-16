@@ -52,4 +52,4 @@ export interface UniversityFilters {
   city?: string;
 }
 
-export type AppTab = "explorer" | "language" | "visa" | "admin";
+export type AppTab = "explorer" | "language" | "visa" | "calculator" | "admin";

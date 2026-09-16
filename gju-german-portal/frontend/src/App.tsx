@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Navbar } from "./components/Navbar";
 import { ToastProvider } from "./components/Toast";
 import { Admin } from "./pages/Admin";
+import { CostCalculator } from "./pages/CostCalculator";
 import { LanguageTracker } from "./pages/LanguageTracker";
 import { UniExplorer } from "./pages/UniExplorer";
 import { VisaChecklist } from "./pages/VisaChecklist";
@@ -25,6 +26,7 @@ function AppShell() {
         {tab === "explorer" ? <UniExplorer /> : null}
         {tab === "language" ? <LanguageTracker /> : null}
         {tab === "visa" ? <VisaChecklist /> : null}
+        {tab === "calculator" ? <CostCalculator /> : null}
         {tab === "admin" ? <Admin /> : null}
       </main>
     </div>

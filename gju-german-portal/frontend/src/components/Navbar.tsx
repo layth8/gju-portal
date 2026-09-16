@@ -1,4 +1,4 @@
-import { GraduationCap, Landmark, Moon, Plane, Shield, Sun } from "lucide-react";
+import { Calculator, GraduationCap, Landmark, Moon, Plane, Shield, Sun } from "lucide-react";
 import type { AppTab } from "../types";
 
 interface NavbarProps {
@@ -12,6 +12,7 @@ const TABS: { id: AppTab; label: string; icon: typeof GraduationCap }[] = [
   { id: "explorer", label: "University Explorer", icon: Landmark },
   { id: "language", label: "Language Pathway", icon: GraduationCap },
   { id: "visa", label: "Visa Checklist", icon: Plane },
+  { id: "calculator", label: "Cost & Sperrkonto", icon: Calculator },
   { id: "admin", label: "Admin", icon: Shield },
 ];
 
