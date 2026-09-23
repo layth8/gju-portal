@@ -1,4 +1,4 @@
-import { Calculator, Globe, GraduationCap, Landmark, Moon, Plane, Shield, Sun } from "lucide-react";
+import { Calculator, Globe, GraduationCap, HelpCircle, Landmark, Moon, Plane, Shield, Sun } from "lucide-react";
 import { useLanguage } from "../context/LanguageContext";
 import type { AppTab } from "../types";
 
@@ -7,9 +7,10 @@ interface NavbarProps {
   onTab: (tab: AppTab) => void;
   dark: boolean;
   onToggleTheme: () => void;
+  onOpenGuide: () => void;
 }
 
-export function Navbar({ tab, onTab, dark, onToggleTheme }: NavbarProps) {
+export function Navbar({ tab, onTab, dark, onToggleTheme, onOpenGuide }: NavbarProps) {
   const { language, toggleLanguage, t } = useLanguage();
 
   const tabs: { id: AppTab; label: string; icon: typeof GraduationCap }[] = [
@@ -52,6 +53,17 @@ export function Navbar({ tab, onTab, dark, onToggleTheme }: NavbarProps) {
         </nav>
 
         <div className="flex items-center gap-2">
+          {/* Guide Modal Trigger */}
+          <button
+            type="button"
+            onClick={onOpenGuide}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-300 bg-slate-800/90 hover:bg-slate-700 hover:text-white border border-slate-700 rounded-full transition-all shadow-sm"
+            title="Open Portal Guide"
+          >
+            <HelpCircle className="w-3.5 h-3.5 text-amber-400" />
+            <span>guide?</span>
+          </button>
+
           {/* Language Switcher */}
           <button
             type="button"
