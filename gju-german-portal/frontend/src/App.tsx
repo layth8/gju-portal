@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Navbar } from "./components/Navbar";
 import { ToastProvider } from "./components/Toast";
+import { ChatWidget } from "./components/chat/ChatWidget";
+import { LanguageProvider, useLanguage } from "./context/LanguageContext";
 import { Admin } from "./pages/Admin";
 import { CostCalculator } from "./pages/CostCalculator";
 import { LanguageTracker } from "./pages/LanguageTracker";
@@ -13,6 +15,7 @@ const THEME_KEY = "gju-theme";
 function AppShell() {
   const [tab, setTab] = useState<AppTab>("explorer");
   const [dark, setDark] = useState(() => localStorage.getItem(THEME_KEY) === "dark");
+  const { isRTL } = useLanguage();
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
@@ -20,7 +23,7 @@ function AppShell() {
   }, [dark]);
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(196,163,90,0.12),_transparent_28%),radial-gradient(circle_at_80%_0%,_rgba(139,21,56,0.08),_transparent_24%)]">
+    <div className={`min-h-screen bg-[radial-gradient(circle_at_top,_rgba(196,163,90,0.12),_transparent_28%),radial-gradient(circle_at_80%_0%,_rgba(139,21,56,0.08),_transparent_24%)] ${isRTL ? "font-sans font-arabic" : ""}`}>
       <Navbar tab={tab} onTab={setTab} dark={dark} onToggleTheme={() => setDark((value) => !value)} />
       <main className="mx-auto max-w-7xl px-4 py-10">
         {tab === "explorer" ? <UniExplorer /> : null}
@@ -29,14 +32,17 @@ function AppShell() {
         {tab === "calculator" ? <CostCalculator /> : null}
         {tab === "admin" ? <Admin /> : null}
       </main>
+      <ChatWidget />
     </div>
   );
 }
 
 export default function App() {
   return (
-    <ToastProvider>
-      <AppShell />
-    </ToastProvider>
+    <LanguageProvider>
+      <ToastProvider>
+        <AppShell />
+      </ToastProvider>
+    </LanguageProvider>
   );
 }

@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     database_url: str = "mysql+pymysql://root:YOUR_PASSWORD@localhost:3306/gju_german_portal"
     admin_api_key: str = "change-me-admin-key"
     cors_origins: str = "http://localhost:5173"
+    gemini_api_key: str = ""
+    openai_api_key: str = ""
 
     @property
     def cors_origin_list(self) -> list[str]:

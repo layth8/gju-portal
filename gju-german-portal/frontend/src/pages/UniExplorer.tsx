@@ -4,12 +4,14 @@ import { fetchMajors, fetchUniversities, fetchUniversity, getErrorMessage } from
 import { UniversityCard } from "../components/UniversityCard";
 import { UniversityModal } from "../components/UniversityModal";
 import { useToast } from "../components/Toast";
+import { useLanguage } from "../context/LanguageContext";
 import type { Major, University } from "../types";
 
 export function UniExplorer() {
   const { notify } = useToast();
-  const [majors, setMajors] = useState<Major[]>([]);
+  const { t, language } = useLanguage();
   const [universities, setUniversities] = useState<University[]>([]);
+  const [majors, setMajors] = useState<Major[]>([]);
   const [loading, setLoading] = useState(true);
   const [majorId, setMajorId] = useState("");
   const [germanLevel, setGermanLevel] = useState("");
@@ -24,19 +26,22 @@ export function UniExplorer() {
   }, [query]);
 
   useEffect(() => {
-    fetchMajors()
+    fetchMajors(language)
       .then(setMajors)
       .catch((error) => notify(getErrorMessage(error), "error"));
-  }, [notify]);
+  }, [language, notify]);
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    fetchUniversities({
-      major_id: majorId ? Number(majorId) : undefined,
-      german_level: germanLevel || undefined,
-      city: debouncedQuery.trim() || undefined,
-    })
+    fetchUniversities(
+      {
+        major_id: majorId ? Number(majorId) : undefined,
+        german_level: germanLevel || undefined,
+        city: debouncedQuery.trim() || undefined,
+      },
+      language
+    )
       .then((rows) => {
         if (!cancelled) setUniversities(rows);
       })
@@ -47,7 +52,7 @@ export function UniExplorer() {
     return () => {
       cancelled = true;
     };
-  }, [majorId, germanLevel, debouncedQuery, notify]);
+  }, [majorId, germanLevel, debouncedQuery, language, notify]);
 
   const schools = useMemo(() => [...new Set(majors.map((major) => major.school))], [majors]);
 
@@ -55,7 +60,7 @@ export function UniExplorer() {
     setModalLoading(true);
     setSelected(universities.find((item) => item.id === id) ?? null);
     try {
-      const detail = await fetchUniversity(id);
+      const detail = await fetchUniversity(id, language);
       setSelected(detail);
     } catch (error) {
       notify(getErrorMessage(error), "error");
@@ -68,23 +73,23 @@ export function UniExplorer() {
     <section>
       <div className="mb-8">
         <p className="text-sm font-semibold uppercase tracking-[0.18em] text-gju-crimson dark:text-gju-gold">
-          Partner network
+          {t("explorer_badge")}
         </p>
-        <h1 className="mt-1 font-display text-4xl text-slate-900 dark:text-white">University Explorer</h1>
+        <h1 className="mt-1 font-display text-4xl text-slate-900 dark:text-white">{t("explorer_title")}</h1>
         <p className="mt-2 max-w-2xl text-stone-600 dark:text-stone-300">
-          Filter GJU partner Hochschulen by your major, required German level, and city.
+          {t("explorer_desc")}
         </p>
       </div>
 
       <div className="mb-8 grid gap-3 rounded-2xl border border-stone-200 bg-white p-4 dark:border-white/10 dark:bg-white/5 md:grid-cols-3">
         <label className="text-sm">
-          <span className="mb-1.5 block text-stone-500">GJU major</span>
+          <span className="mb-1.5 block text-stone-500">{t("filter_major")}</span>
           <select
             value={majorId}
             onChange={(event) => setMajorId(event.target.value)}
             className="w-full rounded-xl border border-stone-200 bg-stone-50 px-3 py-2.5 dark:border-white/10 dark:bg-slate-900"
           >
-            <option value="">All majors</option>
+            <option value="">{t("filter_all_majors")}</option>
             {schools.map((school) => (
               <optgroup key={school} label={school}>
                 {majors
@@ -99,27 +104,27 @@ export function UniExplorer() {
           </select>
         </label>
         <label className="text-sm">
-          <span className="mb-1.5 block text-stone-500">Minimum German level</span>
+          <span className="mb-1.5 block text-stone-500">{t("filter_german_level")}</span>
           <select
             value={germanLevel}
             onChange={(event) => setGermanLevel(event.target.value)}
             className="w-full rounded-xl border border-stone-200 bg-stone-50 px-3 py-2.5 dark:border-white/10 dark:bg-slate-900"
           >
-            <option value="">All</option>
+            <option value="">{t("filter_all")}</option>
             <option value="B1">B1</option>
             <option value="B2">B2</option>
             <option value="TestDaF">TestDaF</option>
           </select>
         </label>
         <label className="text-sm">
-          <span className="mb-1.5 block text-stone-500">Search city or name</span>
+          <span className="mb-1.5 block text-stone-500">{t("filter_search")}</span>
           <div className="relative">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" />
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400 rtl:left-auto rtl:right-3" />
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Berlin, HTW, Cologne…"
-              className="w-full rounded-xl border border-stone-200 bg-stone-50 py-2.5 pl-9 pr-3 dark:border-white/10 dark:bg-slate-900"
+              placeholder={t("filter_search_placeholder")}
+              className="w-full rounded-xl border border-stone-200 bg-stone-50 py-2.5 pl-9 pr-3 rtl:pr-9 rtl:pl-3 dark:border-white/10 dark:bg-slate-900"
             />
           </div>
         </label>

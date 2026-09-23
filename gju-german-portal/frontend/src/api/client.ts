@@ -1,5 +1,7 @@
 import axios from "axios";
 import type {
+  ChatMessage,
+  ChatResponse,
   Major,
   University,
   UniversityCreate,
@@ -10,7 +12,7 @@ import type {
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || "http://localhost:8000",
-  timeout: 15000,
+  timeout: 30000,
 });
 
 export function setAdminKey(key: string | null) {
@@ -21,23 +23,34 @@ export function setAdminKey(key: string | null) {
   }
 }
 
-export async function fetchMajors(): Promise<Major[]> {
-  const { data } = await api.get<Major[]>("/api/majors");
+export async function sendChatMessage(
+  messages: Array<Pick<ChatMessage, "role" | "content"> | ChatMessage>,
+  language: "en" | "ar" = "en"
+): Promise<ChatResponse> {
+  const { data } = await api.post<ChatResponse>("/api/chat", {
+    messages: messages.map((m) => ({ role: m.role, content: m.content })),
+    language,
+  });
   return data;
 }
 
-export async function fetchUniversities(filters: UniversityFilters = {}): Promise<University[]> {
-  const { data } = await api.get<University[]>("/api/universities", { params: filters });
+export async function fetchMajors(lang: string = "en"): Promise<Major[]> {
+  const { data } = await api.get<Major[]>("/api/majors", { params: { lang } });
   return data;
 }
 
-export async function fetchUniversity(id: number): Promise<University> {
-  const { data } = await api.get<University>(`/api/universities/${id}`);
+export async function fetchUniversities(filters: UniversityFilters = {}, lang: string = "en"): Promise<University[]> {
+  const { data } = await api.get<University[]>("/api/universities", { params: { ...filters, lang } });
   return data;
 }
 
-export async function fetchVisaSteps(): Promise<VisaStep[]> {
-  const { data } = await api.get<VisaStep[]>("/api/visa-steps");
+export async function fetchUniversity(id: number, lang: string = "en"): Promise<University> {
+  const { data } = await api.get<University>(`/api/universities/${id}`, { params: { lang } });
+  return data;
+}
+
+export async function fetchVisaSteps(lang: string = "en"): Promise<VisaStep[]> {
+  const { data } = await api.get<VisaStep[]>("/api/visa-steps", { params: { lang } });
   return data;
 }
 

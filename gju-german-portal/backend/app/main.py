@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.admin import router as admin_router
+from app.api.chat import router as chat_router
 from app.api.majors import router as majors_router
 from app.api.universities import router as universities_router
 from app.api.visa_steps import router as visa_steps_router
@@ -16,7 +17,11 @@ settings = get_settings()
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
-    Base.metadata.create_all(bind=engine)
+    try:
+        Base.metadata.create_all(bind=engine)
+    except Exception as exc:
+        import logging
+        logging.getLogger(__name__).warning("Database initialization skipped or offline: %s", exc)
     yield
 
 
@@ -27,12 +32,17 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+origins = set([
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "https://gju-portal.vercel.app",
+] + settings.cors_origin_list)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "https://gju-portal.vercel.app",
-    ],
+    allow_origins=list(origins),
     allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
@@ -43,6 +53,17 @@ app.include_router(majors_router)
 app.include_router(universities_router)
 app.include_router(visa_steps_router)
 app.include_router(admin_router)
+app.include_router(chat_router, prefix="/api")
+
+
+@app.get("/")
+def root() -> dict[str, str]:
+    return {
+        "message": "GJU German Year Portal API is running.",
+        "docs_url": "/docs",
+        "health_url": "/api/health",
+        "chat_url": "/api/chat",
+    }
 
 
 @app.get("/api/health")

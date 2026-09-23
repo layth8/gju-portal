@@ -5,8 +5,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["DM Sans", "Segoe UI", "system-ui", "sans-serif"],
-        display: ["Fraunces", "Georgia", "serif"],
+        sans: ["Cairo", "DM Sans", "Segoe UI", "system-ui", "sans-serif"],
+        display: ["Fraunces", "Cairo", "Georgia", "serif"],
+        arabic: ["Cairo", "sans-serif"],
       },
       colors: {
         gju: {

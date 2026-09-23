@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { CalendarClock, CheckSquare } from "lucide-react";
 import { fetchVisaSteps, getErrorMessage } from "../api/client";
 import { useToast } from "../components/Toast";
+import { useLanguage } from "../context/LanguageContext";
 import type { VisaStep } from "../types";
 
 const CHECKS_KEY = "gju-visa-checks";
@@ -17,17 +18,18 @@ function loadChecks(): Record<string, boolean> {
 
 export function VisaChecklist() {
   const { notify } = useToast();
+  const { t, language } = useLanguage();
   const [steps, setSteps] = useState<VisaStep[]>([]);
   const [loading, setLoading] = useState(true);
   const [checks, setChecks] = useState<Record<string, boolean>>(loadChecks);
   const [departure, setDeparture] = useState(localStorage.getItem(DATE_KEY) || "");
 
   useEffect(() => {
-    fetchVisaSteps()
+    fetchVisaSteps(language)
       .then(setSteps)
       .catch((error) => notify(getErrorMessage(error), "error"))
       .finally(() => setLoading(false));
-  }, [notify]);
+  }, [language, notify]);
 
   useEffect(() => {
     localStorage.setItem(CHECKS_KEY, JSON.stringify(checks));
@@ -59,17 +61,17 @@ export function VisaChecklist() {
   return (
     <section>
       <p className="text-sm font-semibold uppercase tracking-[0.18em] text-gju-crimson dark:text-gju-gold">
-        German Embassy Amman
+        {t("visa_badge")}
       </p>
-      <h1 className="mt-1 font-display text-4xl text-slate-900 dark:text-white">Visa Checklist</h1>
+      <h1 className="mt-1 font-display text-4xl text-slate-900 dark:text-white">{t("visa_title")}</h1>
       <p className="mt-2 max-w-2xl text-stone-600 dark:text-stone-300">
-        National D-visa preparation for GJU students: Sperrkonto, incoming insurance, documents, and the Abdoun appointment.
+        {t("visa_desc")}
       </p>
 
       <div className="mt-8 grid gap-4 md:grid-cols-[1fr_280px]">
         <div className="rounded-2xl border border-stone-200 bg-white p-5 dark:border-white/10 dark:bg-white/5">
           <div className="mb-2 flex items-center justify-between text-sm">
-            <span className="font-medium">Progress</span>
+            <span className="font-medium">{t("progress")}</span>
             <span>
               {done}/{steps.length || "—"} · {progress}%
             </span>
@@ -80,7 +82,7 @@ export function VisaChecklist() {
         </div>
         <label className="rounded-2xl border border-stone-200 bg-white p-5 dark:border-white/10 dark:bg-white/5">
           <span className="mb-2 flex items-center gap-2 text-sm font-medium">
-            <CalendarClock className="h-4 w-4" /> Target departure
+            <CalendarClock className="h-4 w-4" /> {t("target_departure")}
           </span>
           <input
             type="date"
